@@ -50,8 +50,13 @@ in `src/site/`. See `docs/WEBSITE-ENGINE.md`.
 - [x] Page archetypes: hero, list, form, generic (auth/detail reuse these)
 - [x] Design tokens (Level 3, Depth 1): read colors/font/corners/spacing from a
       mockup and theme the site. `--theme mockup.png` or `parse-tokens`.
-- [ ] Depth 2: component styles (button shape, input style, card treatment)
-- [ ] Depth 3: page layout reproduction (hard — where even v0/Figma are imperfect)
+- [x] Depth 2: component styles (button/input/card design) extracted + applied
+- [~] Depth 3: page layout reproduction (in progress, narrow)
+      - [x] LayoutSpec schema + `.layout` text input + block-composing generator
+            (flat vertical stack: nav/hero/grid/feature/cta/footer, one page)
+      - [ ] Vision path: mockup image → LayoutSpec (the unreliable part)
+      - [ ] Confirm/edit step so users fix misreads before generating
+      - [ ] Expand vocabulary and to multi-page once one page is reliable
 - [ ] More archetypes (map, chat-stub, checkout-stub, dashboard reuse)
 - [ ] "Pages" vision prompt so screenshots → SiteSpec
 - [ ] Auto-detect ERD vs UI-flow and route to the right engine

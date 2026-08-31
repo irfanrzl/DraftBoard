@@ -8,6 +8,7 @@ import {
 describe("design tokens", () => {
   it("accepts valid tokens", () => {
     const t = parseDesignTokens({
+      ...DEFAULT_TOKENS,
       primary: "#ff8800", accent: "#00ccdd", ink: "#111111", bg: "#ffffff",
       radius: "large", font: "serif", density: "spacious",
     });
@@ -37,5 +38,15 @@ describe("design tokens", () => {
   it("maps radius enum to px", () => {
     expect(tokensToCss({ ...DEFAULT_TOKENS, radius: "none" })).toContain("--radius: 0px");
     expect(tokensToCss({ ...DEFAULT_TOKENS, radius: "large" })).toContain("--radius: 22px");
+  });
+
+  it("emits a button radius from buttonShape", () => {
+    expect(tokensToCss({ ...DEFAULT_TOKENS, buttonShape: "pill" })).toContain("--btn-radius: 999px");
+    expect(tokensToCss({ ...DEFAULT_TOKENS, buttonShape: "sharp" })).toContain("--btn-radius: 0px");
+  });
+
+  it("emits shadow tokens", () => {
+    expect(tokensToCss({ ...DEFAULT_TOKENS, shadow: "none" })).toContain("--shadow-md: none");
+    expect(tokensToCss({ ...DEFAULT_TOKENS, shadow: "strong" })).toContain("--shadow-md:");
   });
 });

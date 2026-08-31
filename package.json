@@ -12,6 +12,7 @@
     "web": "npm --prefix web install && npm --prefix web run build && tsx src/server.ts",
     "web:dev": "tsx src/server.ts",
     "site": "tsx src/cli.ts site",
+    "layout": "tsx src/cli.ts layout",
     "parse-tokens": "tsx src/cli.ts parse-tokens",
     "test": "vitest run"
   },

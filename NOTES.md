@@ -169,3 +169,32 @@ Shell (nav + footer) is web/src/App.jsx. Styles in web/src/styles.css.
 To change the landing/about/etc content, edit the page files in web/src/pages/.
 To change the tool, edit web/src/pages/Tool.jsx.
 Remember to update your real email in web/src/pages/About.jsx.
+
+## Depth 3: layout composition (src/site/, in progress)
+
+Reads a page's ARRANGEMENT (which blocks, what order, layout options), not just
+style. Narrow v1: flat vertical stack, one page, fixed block vocabulary.
+
+- layout-spec.ts        — the LayoutSpec (ordered blocks: nav/hero/grid/feature/cta/footer)
+- parse-layouttext.ts   — the ".layout" text format → LayoutSpec (no AI)
+- generate-layout.ts    — LayoutSpec (+ tokens) → single-page React site
+- layout-template/       — the page shell; src/blocks/ has the 6 block components
+
+Run:  npm run layout examples/home.layout -- --out my-page
+      (add --theme mockup.png to also apply Depth 1+2 styling)
+
+The ".layout" format (examples/home.layout):
+  layout "Acme"
+  nav
+  hero split-right      (centered | split-right | split-left)
+  grid 3                (2 | 3 | 4)
+  feature left          (left | right)
+  cta
+  footer
+
+To add a block type: add a component in layout-template/src/blocks/, register it
+in the BLOCKS map in layout-template/src/Page.jsx, add the type to BlockType in
+layout-spec.ts, and handle it in parse-layouttext.ts.
+
+NEXT: the vision path (image → LayoutSpec) — the hard, unreliable part — plus a
+confirm/edit step. Deterministic text path is built and proven first (on purpose).

@@ -45,6 +45,12 @@ function sanitizeTokens(raw: any): DesignTokens {
   if (["none", "small", "medium", "large"].includes(raw?.radius)) out.radius = raw.radius;
   if (["sans", "serif", "mono"].includes(raw?.font)) out.font = raw.font;
   if (["tight", "comfortable", "spacious"].includes(raw?.density)) out.density = raw.density;
+  // Depth 2 component styles
+  if (["filled", "outline", "soft"].includes(raw?.buttonStyle)) out.buttonStyle = raw.buttonStyle;
+  if (["sharp", "rounded", "pill"].includes(raw?.buttonShape)) out.buttonShape = raw.buttonShape;
+  if (["box", "underline", "filled"].includes(raw?.inputStyle)) out.inputStyle = raw.inputStyle;
+  if (["border", "shadow", "flat", "elevated"].includes(raw?.cardStyle)) out.cardStyle = raw.cardStyle;
+  if (["none", "soft", "strong"].includes(raw?.shadow)) out.shadow = raw.shadow;
 
   return parseDesignTokens(out);
 }

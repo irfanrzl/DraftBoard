@@ -11,6 +11,8 @@ import { generateHtml } from "./generate-html.js";
 import { generateProject } from "./generate-app.js";
 import { parseSiteText } from "./site/parse-sitetext.js";
 import { generateSite } from "./site/generate-site.js";
+import { parseLayoutText } from "./site/parse-layouttext.js";
+import { generateLayout } from "./site/generate-layout.js";
 import { extractTokens } from "./site/extract-tokens.js";
 import { DEFAULT_TOKENS } from "./site/design-tokens.js";
 import type { Spec } from "./spec.js";
@@ -122,6 +124,48 @@ async function main() {
         spec.entities.map((e) => e.name).join(", "),
     );
     scaffold(spec, outDirFrom(rest));
+    return;
+  }
+
+  // ---- Depth 3: build a single page from a .layout file (block stack) ----
+  if (command === "layout") {
+    let source: string;
+    try {
+      source = readFileSync(file, "utf8");
+    } catch {
+      console.error(`Cannot read file: ${file}`);
+      process.exit(1);
+    }
+    const name = capitalize(basename(file).replace(/\.[^.]+$/, ""));
+    let layoutSpec;
+    try {
+      layoutSpec = parseLayoutText(source, name);
+    } catch (err) {
+      console.error("Failed to parse .layout file:");
+      console.error(err instanceof Error ? err.message : String(err));
+      process.exit(1);
+    }
+
+    const target = resolve(outDirFrom(rest));
+    let tokens = DEFAULT_TOKENS;
+    const themeFlag = rest.indexOf("--theme");
+    if (themeFlag !== -1 && rest[themeFlag + 1]) {
+      try {
+        tokens = await extractTokens(rest[themeFlag + 1]);
+        console.log(`Theme: primary ${tokens.primary}, ${tokens.buttonStyle} ${tokens.buttonShape} buttons.`);
+      } catch (err) {
+        console.error("Could not extract theme, using default.");
+      }
+    }
+
+    const files = generateLayout(layoutSpec, target, tokens);
+    console.log(`Composed page from ${layoutSpec.blocks.length} blocks: ${layoutSpec.blocks.map((b) => b.type).join(" → ")}`);
+    console.log(`Scaffolded ${files.length} files into ${target}`);
+    console.log(``);
+    console.log(`Next steps:`);
+    console.log(`  cd ${outDirFrom(rest)}`);
+    console.log(`  npm install`);
+    console.log(`  npm run dev`);
     return;
   }
 

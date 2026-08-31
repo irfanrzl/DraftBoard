@@ -153,3 +153,52 @@ main { flex: 1; }
   margin-top: 40px;
 }
 .muted { color: var(--muted); }
+
+/* ============ DEPTH 2: component styles (driven by body data-* attrs) ============ */
+
+/* Button shape — from --btn-radius */
+.btn { border-radius: var(--btn-radius, var(--radius)); }
+
+/* Button style variants */
+[data-btn="outline"] .btn-primary {
+  background: transparent; color: var(--accent);
+  border: 1.5px solid var(--accent); box-shadow: none;
+}
+[data-btn="outline"] .btn-primary:hover {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  transform: translateY(-2px);
+}
+[data-btn="soft"] .btn-primary {
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg));
+  color: var(--accent); box-shadow: none;
+}
+[data-btn="soft"] .btn-primary:hover {
+  background: color-mix(in srgb, var(--accent) 22%, var(--bg));
+  transform: translateY(-2px);
+}
+
+/* Input style variants */
+[data-input="underline"] .field input,
+[data-input="underline"] .field textarea {
+  border: 0; border-bottom: 2px solid var(--line); border-radius: 0;
+  padding-left: 2px; padding-right: 2px; background: transparent;
+}
+[data-input="underline"] .field input:focus,
+[data-input="underline"] .field textarea:focus {
+  box-shadow: none; border-bottom-color: var(--accent);
+}
+[data-input="filled"] .field input,
+[data-input="filled"] .field textarea {
+  border: 1px solid transparent; background: var(--soft);
+}
+[data-input="filled"] .field input:focus,
+[data-input="filled"] .field textarea:focus {
+  background: var(--bg); border-color: var(--accent);
+}
+
+/* Card style variants */
+[data-card="shadow"] .card { border-color: transparent; box-shadow: var(--shadow-md); }
+[data-card="flat"] .card { border: 0; box-shadow: none; background: var(--soft); }
+[data-card="flat"] .card:hover { transform: none; box-shadow: none; background: color-mix(in srgb, var(--accent) 5%, var(--soft)); }
+[data-card="elevated"] .card { border-color: transparent; box-shadow: var(--shadow-lg); }
+[data-card="elevated"] .card:hover { box-shadow: 0 36px 90px rgba(16,16,32,0.22); }

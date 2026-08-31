@@ -87,14 +87,31 @@ it to the generated site. It extracts a small, reliable set of tokens:
   "bg": "#ffffff",
   "radius": "medium",
   "font": "sans",
-  "density": "comfortable"
+  "density": "comfortable",
+  "buttonStyle": "filled",
+  "buttonShape": "rounded",
+  "inputStyle": "box",
+  "cardStyle": "border",
+  "shadow": "soft"
 }
 ```
 
+Palette & feel (Depth 1):
 - `primary`/`accent`/`ink`/`bg` — colors (validated as hex)
 - `radius` — none / small / medium / large (corner roundness)
 - `font` — sans / serif / mono
 - `density` — tight / comfortable / spacious (spacing)
+
+Component styles (Depth 2) — read from the mockup's buttons, inputs, and cards:
+- `buttonStyle` — filled / outline / soft
+- `buttonShape` — sharp / rounded / pill
+- `inputStyle` — box / underline / filled
+- `cardStyle` — border / shadow / flat / elevated
+- `shadow` — none / soft / strong (overall depth)
+
+These become body `data-*` attributes and CSS variables, so the same site
+templates restyle their components to echo the mockup — a design with ghost
+pill buttons and underline inputs produces a site that mirrors that.
 
 These become CSS variables in the generated site's stylesheet, re-theming the
 same templates. Without `--theme`, the preset default is used (the adaptive
@@ -108,9 +125,9 @@ idea: preset when no design is given, extracted tokens when a mockup is).
 - **Colors drift.** The model reads "roughly this blue," not always the exact
   hex. It's non-deterministic — the same image can give slightly different
   tokens run to run.
-- **This is theme only (Depth 1).** It captures colors/font/corners/spacing, not
-  component *design* (button shape, input style, card treatment) or page layout.
-  Those are Depth 2 and Depth 3 — planned, not built.
+- **This is Depth 1 + Depth 2.** It captures colors/font/corners/spacing *and*
+  component styles (button/input/card design). It does not reproduce page
+  *layout* (where blocks go) — that's Depth 3, not built.
 - If the model returns junk, the sanitizer falls back to sensible defaults
   rather than failing.
 
