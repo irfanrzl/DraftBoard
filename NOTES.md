@@ -71,7 +71,7 @@ part that uses AI (a screenshot is just pixels — needs a model to read it).
 - `src/parse-image.ts`   — ties it together: image file -> Spec
 
 **Swap backend:** set `VISION_PROVIDER=ollama` (default) or `=gemini`.
-That's the whole switch. See docs-screenshot.md.
+That's the whole switch. See docs/VISION.md.
 
 **Why swappable:** free/local now for me; when I commercialize, flip to Gemini
 so one business key serves all users (they don't each need an account). The

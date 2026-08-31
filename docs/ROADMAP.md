@@ -42,7 +42,7 @@ Where Draftboard is and where it's going. Checked = done and working.
 ## The second engine: UI-flow → website (in progress)
 
 A parallel pipeline for a different kind of diagram (pages + navigation). Lives
-in `src/site/`. See `docs/WEBSITE-PIPELINE.md` for the full plan.
+in `src/site/`. See `docs/WEBSITE-ENGINE.md`.
 
 - [x] A `SiteSpec` shape (pages, types, navigation) — `src/site/site-spec.ts`
 - [x] A `.site` text input — `src/site/parse-sitetext.ts` (test without AI)

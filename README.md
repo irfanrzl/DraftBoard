@@ -18,7 +18,7 @@ npm run web
 
 Open http://localhost:3000. Paste DBML or Mermaid, or upload an ERD screenshot,
 click Generate, see the live preview, and download the full React project.
-(Screenshot input needs Ollama running — see `docs-screenshot.md`.)
+(Screenshot input needs a vision model — see `docs/VISION.md`.)
 
 ## Run it (command line)
 
@@ -44,7 +44,7 @@ npm run dev
 ## From a screenshot (AI feature)
 
 Turn a picture of an ERD into a dashboard. Needs a vision model — free with a
-local Ollama install (see `docs-screenshot.md`):
+local vision model (see `docs/VISION.md`):
 
 ```bash
 npm run scaffold-image path/to/your-erd.png -- --out my-dashboard
@@ -78,9 +78,9 @@ for API calls; nothing else changes.
 ## Docs
 
 - `NOTES.md` — casual "where do I change X" guide for future-me
-- `docs/ARCHITECTURE.md` — how the pipeline fits together
-- `docs/HEURISTICS.md` — the field → UI rules (the brain)
-- `docs/ROADMAP.md` — what's done and what's next
-- `docs/WEBSITE-PIPELINE.md` — the phase-2 plan (UI-flow → website)
+- `docs/ARCHITECTURE.md` — how it works: the two engines + shared vision
+- `docs/VISION.md` — reading images (ERD screenshots, design mockups), model setup
+- `docs/HEURISTICS.md` — dashboard field → UI rules
 - `docs/WEBSITE-ENGINE.md` — the website engine + design-token theming
-- `docs-screenshot.md` — screenshot feature setup (Ollama / Gemini)
+- `docs/ROADMAP.md` — the journey: what's done and what's next
+- `NOTES.md` — casual "where do I change X" for future-me

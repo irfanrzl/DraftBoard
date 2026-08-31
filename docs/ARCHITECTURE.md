@@ -1,75 +1,99 @@
 # Architecture
 
-Draftboard is a **pipeline**: a diagram goes in one end, a dashboard comes out
-the other. Everything is organized around one idea in the middle — the **Spec**.
+Draftboard is one product with **two engines** that share a common approach and a
+common AI-vision module. Each engine is a pipeline: something goes in, an
+intermediate spec is produced, a generator turns that spec into a runnable
+project.
 
 ```
-                          ┌─────────────┐
-   DBML text ───────────▶ │             │
-                          │             │
-   Screenshot ─▶ vision ▶ │    Spec     │ ─▶ generator ─▶ dashboard
-                          │  (JSON)     │
-   (Mermaid, later) ────▶ │             │
-                          └─────────────┘
+                 ┌──────────────── shared ────────────────┐
+                 │            src/vision/                  │
+                 │   reads images (diagrams, mockups)      │
+                 └───────────────┬─────────────────────────┘
+                                 │
+   DASHBOARD ENGINE              │            WEBSITE ENGINE
+   ───────────────              │            ──────────────
+   DBML / Mermaid text ─┐       │       ┌─ .site text
+   ERD screenshot ──────┼─► Spec │ Spec ─┤
+                        │   (JSON)│(Site) │  mockup image ─► design tokens
+                        ▼        ▼        ▼
+                   generate-app       generate-site
+                        │                 │
+                        ▼                 ▼
+                 React dashboard    React multi-page site
 ```
 
-## The Spec is the hub
+The guiding idea, in both engines: **inputs converge on one intermediate spec,
+and generators read only that spec.** New inputs can be added without touching
+generators; generators can change without touching inputs.
 
-The Spec is a plain JSON description of a data model: entities, their fields
-(with a type and a UI hint), and the relations between them. It's defined and
-validated in `src/spec.ts` using Zod.
+## Dashboard engine
 
-Why it matters: **every input produces a Spec, and the generator only reads a
-Spec.** So you can add new inputs (Mermaid, screenshots) without touching the
-generator, and change the generator without touching the parsers. The Spec is
-the contract that keeps the two ends independent.
+Turns a database schema into an interactive admin dashboard.
 
-## The files, by job
+- **Inputs** (all produce the same `Spec`):
+  - `src/parser.ts` — DBML text. Holds the heuristics that decide each field's
+    UI (see `HEURISTICS.md`).
+  - `src/parse-mermaid.ts` — Mermaid ERD text. Reuses the same heuristics.
+  - `src/parse-image.ts` — an ERD screenshot, via the vision module.
+- **Contract:** `src/spec.ts` — the `Spec` (entities, fields, relations),
+  validated with Zod.
+- **Generators:**
+  - `src/generate-html.ts` — one self-contained HTML preview.
+  - `src/generate-app.ts` — a full React + Vite project (CRUD, search, relations).
+  - `src/mock.ts` — sample data so a new dashboard has rows to show.
+- **Generated app:** `app-template/` — a generic dashboard that reads an injected
+  `schema.js` and works for any data model.
 
-### Inputs (produce a Spec)
-- `src/parser.ts` — DBML text → Spec. Contains the **heuristics**: the rules
-  that decide each field's UI component (see `docs/HEURISTICS.md`). This is the
-  "brain" of the text path.
-- `src/parse-image.ts` — a screenshot → Spec, using the vision module.
-- `src/vision/` — the swappable AI backend that reads images:
-  - `types.ts` — the interface every backend implements ("the plug")
-  - `prompt.ts` — the instruction given to the model (shared by all backends)
-  - `ollama.ts` — local backend (free, default)
-  - `gemini.ts` — cloud backend (for commercial use)
-  - `sanitize.ts` — repairs common model mistakes before validation
-  - `index.ts` — picks a backend based on `VISION_PROVIDER`
+## Website engine
 
-### The contract
-- `src/spec.ts` — the Spec type + Zod validation. Nothing depends on anything
-  else here; everything depends on this.
+Turns a page/navigation description into a multi-page website, optionally themed
+from a mockup. Lives in `src/site/`.
 
-### Outputs (consume a Spec)
-- `src/mock.ts` — generates sample rows so a new dashboard has data to show.
-- `src/generate-html.ts` — Spec → one self-contained HTML file (quick preview).
-- `src/generate-app.ts` — Spec → a full React + Vite project (the real thing).
+- **Inputs:**
+  - `src/site/parse-sitetext.ts` — the `.site` text format → `SiteSpec`.
+  - `src/site/extract-tokens.ts` — a mockup image → `DesignTokens`, via the
+    vision module.
+- **Contracts:**
+  - `src/site/site-spec.ts` — the `SiteSpec` (pages, types, navigation).
+  - `src/site/design-tokens.ts` — the `DesignTokens` (colors, font, corners,
+    spacing) + the token→CSS mapping.
+- **Generator:** `src/site/generate-site.ts` — `SiteSpec` (+ tokens) → a React +
+  Vite + React Router site.
+- **Generated app:** `src/site/site-template/` — a generic site whose pages are
+  rendered by archetype components (`hero`, `list`, `form`, `generic`).
 
-### The generated app (a separate app)
-- `app-template/` — a complete, generic React dashboard. It reads an injected
-  `schema.js` (the Spec) and works for *any* data model. When you scaffold, this
-  folder is copied out and `schema.js` + `seedData.js` are written into it.
+See `WEBSITE-ENGINE.md` for the full website engine detail.
 
-### The entry point
-- `src/cli.ts` — the command you run. Routes to parse / generate / scaffold for
-  text, and parse-image / scaffold-image for screenshots.
+## The shared vision module
 
-## The key design choice
+`src/vision/` reads images for both engines. It's swappable and prompt-flexible:
 
-The generated dashboard is a **generic engine** that reads a schema, not a
-hand-built app per diagram. Draftboard's job is just to write the schema and
-sample data into that engine. This is why one small template supports unlimited
-different dashboards — and why connecting real data later means changing only one
-file (`app-template/src/store.jsx`), not regenerating anything.
+- `types.ts` — the `VisionProvider` interface. `readDiagram()` takes an image and
+  optional custom prompts, so the same module reads ERDs *and* design mockups.
+- `ollama.ts` — local backend (default model `qwen3-vl`).
+- `gemini.ts` — cloud backend (for scale / commercial use).
+- `index.ts` — picks a backend via `VISION_PROVIDER`.
+- `prompt.ts` — the ERD-reading prompt; `sanitize.ts` — repairs model output
+  before validation.
 
-## Where "creativity" lives
+Only image inputs use AI. All text inputs (DBML, Mermaid, `.site`) are
+deterministic.
 
-Not in an AI model — in two authored places:
-1. The **heuristics** in `src/parser.ts` (field → UI decisions)
-2. The **components** in `app-template/src/components/` (how each UI type looks)
+## The interface layer
 
-AI is used in exactly one spot: reading a screenshot into a Spec. Everything else
-is deterministic and testable.
+- `src/cli.ts` — the command line for every capability.
+- `src/server.ts` + `web/` — a local web app (currently the dashboard side):
+  paste a diagram or upload a screenshot, preview, download.
+
+## Design principles
+
+- **One spec per engine is the contract.** Parsers never talk to generators
+  directly.
+- **AI is used only for images, and only where nothing else can substitute.**
+  The deterministic text paths always work without a model.
+- **Generated apps are generic engines** that read injected data (`schema.js`,
+  `site.js`, tokens), not hand-built per input. One template, unlimited outputs.
+- **Honesty over magic.** Outputs are strong *skeletons*; what a diagram or
+  mockup can't specify (real content, business logic, pixel-exact layout) is left
+  to the user.

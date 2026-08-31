@@ -1,8 +1,9 @@
-# Heuristics
+# Heuristics (dashboard field → UI)
 
-The rules that turn a field's **type and name** into a **UI component**. This is
-the core judgment of the tool — encoded design decisions, not AI guesses. They
-live in `src/parser.ts` (`inferType`, `inferRole`, `inferUi`).
+The rules that turn a database field's **type and name** into a **UI component**
+in the dashboard engine. This is the core judgment of that engine — encoded
+design decisions, not AI guesses. They live in `src/parser.ts` (`inferType`,
+`inferRole`, `inferUi`) and are reused by the Mermaid parser.
 
 ## Type → UI component
 
