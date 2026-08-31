@@ -76,3 +76,11 @@ That's the whole switch. See docs-screenshot.md.
 **Why swappable:** free/local now for me; when I commercialize, flip to Gemini
 so one business key serves all users (they don't each need an account). The
 dashboard generator never changes — only the "image reader" plug does.
+
+## Mermaid input
+
+`src/parse-mermaid.ts` reads Mermaid `erDiagram` text and returns the same Spec
+as the DBML parser. The CLI auto-detects it: files ending `.mmd`/`.mermaid`, or
+text starting with `erDiagram`, use the Mermaid parser. It reuses the same
+heuristics (`inferType`/`inferRole`/`inferUi` from `parser.ts`) so field
+decisions stay identical across both formats. Example: `examples/shop.mmd`.

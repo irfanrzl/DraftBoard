@@ -13,6 +13,9 @@ npm install
 # see the parsed structure
 npm run parse examples/blog.dbml
 
+# also works with Mermaid ERD text
+npm run parse examples/shop.mmd
+
 # quick single-file HTML preview
 npm run generate examples/blog.dbml -- --out preview
 

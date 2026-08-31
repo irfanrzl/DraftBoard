@@ -25,8 +25,8 @@ Where Draftboard is and where it's going. Checked = done and working.
 
 ## Next (dashboard side)
 
-- [ ] **Mermaid ERD input** — accept Mermaid text as well as DBML
-      (new file `src/parse-mermaid.ts` → same Spec, everything downstream works)
+- [x] **Mermaid ERD input** — accepts Mermaid text as well as DBML
+      (`src/parse-mermaid.ts` → same Spec, everything downstream works)
 - [ ] **Better screenshot accuracy** — update to llama3.2-vision, or Gemini
 - [ ] **A confirm/edit step** — show the extracted Spec and let the user fix it
       before generating (useful because vision isn't 100% reliable)

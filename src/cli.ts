@@ -5,6 +5,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { parseDbml } from "./parser.js";
+import { parseMermaid } from "./parse-mermaid.js";
 import { parseImage } from "./parse-image.js";
 import { generateHtml } from "./generate-html.js";
 import { generateProject } from "./generate-app.js";
@@ -12,10 +13,10 @@ import type { Spec } from "./spec.js";
 
 function usage(): never {
   console.error(`Usage:
-  Text (DBML):
-    npm run parse     <file.dbml>                 print the Spec JSON
-    npm run generate  <file.dbml> -- --out dir     single-file HTML preview
-    npm run scaffold  <file.dbml> -- --out dir     full React dashboard
+  Text (DBML or Mermaid):
+    npm run parse     <file.dbml|.mmd>            print the Spec JSON
+    npm run generate  <file> -- --out dir           single-file HTML preview
+    npm run scaffold  <file> -- --out dir           full React dashboard (DBML or Mermaid)
 
   Image (screenshot -> needs a vision model, Ollama by default):
     npm run parse-image    <image.png>             print the Spec JSON
@@ -52,7 +53,7 @@ function scaffold(spec: Spec, outDir: string) {
   console.log(`  npm run dev`);
 }
 
-function specFromDbml(file: string): Spec {
+function specFromText(file: string): Spec {
   let source: string;
   try {
     source = readFileSync(file, "utf8");
@@ -61,8 +62,15 @@ function specFromDbml(file: string): Spec {
     process.exit(1);
   }
   const schemaName = capitalize(basename(file).replace(/\.[^.]+$/, ""));
+  const ext = file.toLowerCase();
+  const isMermaid =
+    ext.endsWith(".mmd") ||
+    ext.endsWith(".mermaid") ||
+    source.trimStart().startsWith("erDiagram");
   try {
-    return parseDbml(source, schemaName);
+    return isMermaid
+      ? parseMermaid(source, schemaName)
+      : parseDbml(source, schemaName);
   } catch (err) {
     console.error("Failed to parse into a valid Spec:");
     console.error(err instanceof Error ? err.message : String(err));
@@ -77,7 +85,7 @@ async function main() {
   let command = argv[0];
   let rest = argv.slice(1);
   // back-compat: a bare .dbml file means "parse"
-  if (command.endsWith(".dbml")) {
+  if (command.endsWith(".dbml") || command.endsWith(".mmd") || command.endsWith(".mermaid")) {
     command = "parse";
     rest = argv;
   }
@@ -109,7 +117,7 @@ async function main() {
   }
 
   // ---- Text (DBML) commands ----
-  const spec = specFromDbml(file);
+  const spec = specFromText(file);
 
   if (command === "parse") {
     console.log(JSON.stringify(spec, null, 2));

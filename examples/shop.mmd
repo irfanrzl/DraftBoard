@@ -1,0 +1,23 @@
+erDiagram
+    USER ||--o{ ORDER : places
+    USER {
+        uuid id PK
+        string email
+        string name
+        string status
+        datetime created_at
+    }
+    ORDER ||--|{ LINE_ITEM : contains
+    ORDER {
+        uuid id PK
+        uuid user_id FK
+        float total
+        string status
+        datetime created_at
+    }
+    LINE_ITEM {
+        uuid id PK
+        uuid order_id FK
+        int quantity
+        float price
+    }
