@@ -9,6 +9,7 @@
     "scaffold": "tsx src/cli.ts create",
     "parse-image": "tsx src/cli.ts parse-image",
     "scaffold-image": "tsx src/cli.ts scaffold-image",
+    "web": "tsx src/server.ts",
     "test": "vitest run"
   },
   "dependencies": {

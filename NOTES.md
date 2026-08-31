@@ -84,3 +84,14 @@ as the DBML parser. The CLI auto-detects it: files ending `.mmd`/`.mermaid`, or
 text starting with `erDiagram`, use the Mermaid parser. It reuses the same
 heuristics (`inferType`/`inferRole`/`inferUi` from `parser.ts`) so field
 decisions stay identical across both formats. Example: `examples/shop.mmd`.
+
+## Web interface
+
+`src/server.ts` + `web/index.html` = a local control panel. Run `npm run web`,
+open http://localhost:3000. It's a thin wrapper: the server reuses parseDbml /
+parseMermaid / parseImage / generateHtml / generateProject — no engine changes.
+- Paste text or upload a screenshot → POST /api/generate → preview HTML
+- Download button → POST /api/download → project files → zipped in the browser
+No web framework; just Node's built-in http. To change how the page looks, edit
+web/index.html. To put it online later, switch screenshot input to Gemini
+(VISION_PROVIDER=gemini) since a server won't have local Ollama.

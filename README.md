@@ -5,7 +5,18 @@ Turn a database diagram into a working dashboard.
 Write your data model as DBML, and this tool generates an interactive
 React admin dashboard — tables, forms, detail views, and linked relations.
 
-## Run it
+## Easiest way: the web interface
+
+```bash
+npm install
+npm run web
+```
+
+Open http://localhost:3000. Paste DBML or Mermaid, or upload an ERD screenshot,
+click Generate, see the live preview, and download the full React project.
+(Screenshot input needs Ollama running — see `docs-screenshot.md`.)
+
+## Run it (command line)
 
 ```bash
 npm install

@@ -33,9 +33,11 @@ Where Draftboard is and where it's going. Checked = done and working.
 
 ## Next (making it a product)
 
-- [ ] **Web interface** — a page where you paste a diagram or upload a
-      screenshot and get the dashboard, instead of the command line. This is the
-      bridge to real users and reused by the website pipeline later.
+- [x] **Web interface** — a local page where you paste a diagram or upload a
+      screenshot and get the dashboard, with live preview + download. Run it
+      with `npm run web`. (Reused by the website pipeline later.)
+- [ ] **Deploy it online** — put the web interface on a server so others can use
+      it. Needs switching screenshot input from Ollama to Gemini (already built).
 
 ## Later (the bigger vision: UI-flow → website)
 
