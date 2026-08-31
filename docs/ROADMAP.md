@@ -39,16 +39,19 @@ Where Draftboard is and where it's going. Checked = done and working.
 - [ ] **Deploy it online** — put the web interface on a server so others can use
       it. Needs switching screenshot input from Ollama to Gemini (already built).
 
-## Later (the bigger vision: UI-flow → website)
+## The second engine: UI-flow → website (in progress)
 
-A second, parallel pipeline for a different kind of diagram (pages + navigation,
-not tables + relations). See `docs/WEBSITE-PIPELINE.md` for the plan.
+A parallel pipeline for a different kind of diagram (pages + navigation). Lives
+in `src/site/`. See `docs/WEBSITE-PIPELINE.md` for the full plan.
 
-- [ ] New "pages" prompt for the vision model
-- [ ] A `SiteSpec` shape (pages, types, navigation)
-- [ ] A page-type library (form, hero, list, map, chat-stub, checkout-stub)
-- [ ] A site generator that emits a multi-page React app with routing
-- [ ] Auto-detect ERD vs UI-flow and route to the right pipeline
+- [x] A `SiteSpec` shape (pages, types, navigation) — `src/site/site-spec.ts`
+- [x] A `.site` text input — `src/site/parse-sitetext.ts` (test without AI)
+- [x] Site generator → real multi-page React + Router site — `src/site/generate-site.ts`
+- [x] Page archetypes: hero, list, form, generic (auth/detail reuse these)
+- [ ] More archetypes (map, chat-stub, checkout-stub, dashboard reuse)
+- [ ] "Pages" vision prompt so screenshots → SiteSpec
+- [ ] Auto-detect ERD vs UI-flow and route to the right engine
+- [ ] Offer website mode in the web interface
 
 ## Non-goals (for now)
 

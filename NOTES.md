@@ -95,3 +95,34 @@ parseMermaid / parseImage / generateHtml / generateProject — no engine changes
 No web framework; just Node's built-in http. To change how the page looks, edit
 web/index.html. To put it online later, switch screenshot input to Gemini
 (VISION_PROVIDER=gemini) since a server won't have local Ollama.
+
+## The second engine: website generation (src/site/)
+
+The website engine is quarantined in src/site/ so it doesn't tangle with the
+dashboard engine. Same 3-stage shape:
+
+  .site text → SiteSpec (JSON) → site generator → multi-page React site
+
+- `site/site-spec.ts`      — the SiteSpec schema (pages, types, links)
+- `site/parse-sitetext.ts` — reads the ".site" text format → SiteSpec
+- `site/generate-site.ts`  — SiteSpec → a real React + React Router site
+- `site/site-template/`    — the generic site app (copied out on generate)
+- `site/site-template/src/pages/` — the ARCHETYPES: Hero, List, Form, Generic
+
+Run it:  npm run site examples/acme.site -- --out my-site
+Then:    cd my-site && npm install && npm run dev
+
+The ".site" format (see examples/acme.site):
+  site "Name"
+  page Home : hero
+    -> Services       (a nav link)
+  page Services : list
+  page Contact : form
+
+To add a new page type: add an archetype component in site-template/src/pages/,
+register it in the ARCHETYPES map in site-template/src/App.jsx, and add the type
+name to PageType in site-spec.ts. Text/vision inputs need no change.
+
+Honest limit: this produces a SKELETON (right pages, working navigation,
+placeholder layouts). Real content and logic are the user's to fill in — a
+diagram can't specify those.

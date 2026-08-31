@@ -9,6 +9,8 @@ import { parseMermaid } from "./parse-mermaid.js";
 import { parseImage } from "./parse-image.js";
 import { generateHtml } from "./generate-html.js";
 import { generateProject } from "./generate-app.js";
+import { parseSiteText } from "./site/parse-sitetext.js";
+import { generateSite } from "./site/generate-site.js";
 import type { Spec } from "./spec.js";
 
 function usage(): never {
@@ -113,6 +115,39 @@ async function main() {
         spec.entities.map((e) => e.name).join(", "),
     );
     scaffold(spec, outDirFrom(rest));
+    return;
+  }
+
+  // ---- Website engine: build a multi-page site from a .site file ----
+  if (command === "site") {
+    let source: string;
+    try {
+      source = readFileSync(file, "utf8");
+    } catch {
+      console.error(`Cannot read file: ${file}`);
+      process.exit(1);
+    }
+    const name = capitalize(basename(file).replace(/\.[^.]+$/, ""));
+    let siteSpec;
+    try {
+      siteSpec = parseSiteText(source, name);
+    } catch (err) {
+      console.error("Failed to parse .site file:");
+      console.error(err instanceof Error ? err.message : String(err));
+      process.exit(1);
+    }
+    const target = resolve(outDirFrom(rest));
+    const files = generateSite(siteSpec, target);
+    console.log(
+      `Built ${siteSpec.pages.length} pages: ` +
+        siteSpec.pages.map((p) => p.label).join(", "),
+    );
+    console.log(`Scaffolded ${files.length} files into ${target}`);
+    console.log(``);
+    console.log(`Next steps:`);
+    console.log(`  cd ${outDirFrom(rest)}`);
+    console.log(`  npm install`);
+    console.log(`  npm run dev`);
     return;
   }
 
