@@ -2,15 +2,25 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from "n
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { SiteSpec } from "./site-spec.js";
+import {
+  DEFAULT_TOKENS,
+  tokensToCss,
+  type DesignTokens,
+} from "./design-tokens.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATE_DIR = join(__dirname, "site-template");
 
 /**
- * Generate a complete, runnable React + Vite + React Router site from a
- * SiteSpec. Writes all files under outDir. User runs npm install && npm run dev.
+ * Generate a complete React + Vite + React Router site from a SiteSpec.
+ * Optionally themes it with design tokens (extracted from a mockup); otherwise
+ * uses the preset default theme.
  */
-export function generateSite(spec: SiteSpec, outDir: string): string[] {
+export function generateSite(
+  spec: SiteSpec,
+  outDir: string,
+  tokens: DesignTokens = DEFAULT_TOKENS,
+): string[] {
   const written: string[] = [];
 
   for (const rel of listFiles(TEMPLATE_DIR)) {
@@ -24,14 +34,25 @@ export function generateSite(spec: SiteSpec, outDir: string): string[] {
   const srcDir = join(outDir, "src");
   mkdirSync(srcDir, { recursive: true });
 
-  const siteJs =
-    "// AUTO-GENERATED from your diagram. Do not edit by hand.\n" +
-    "export const site = " + JSON.stringify(spec, null, 2) + ";\n";
-  writeFileSync(join(srcDir, "site.js"), siteJs);
+  // site data
+  writeFileSync(
+    join(srcDir, "site.js"),
+    "// AUTO-GENERATED from your diagram.\nexport const site = " +
+      JSON.stringify(spec, null, 2) + ";\n",
+  );
   written.push(join(srcDir, "site.js"));
 
-  const readme = `# ${spec.name}\n\nAuto-generated website skeleton.\n\n## Run it\n\n\`\`\`bash\nnpm install\nnpm run dev\n\`\`\`\n\nPages: ${spec.pages.map((p) => p.label).join(", ")}\n\nThis is a starting skeleton — real content, images, and logic are yours to fill in.\n`;
-  writeFileSync(join(outDir, "README.md"), readme);
+  // theme: prepend token CSS variables to the base stylesheet, so the same
+  // templates get re-themed by the extracted (or default) palette.
+  const baseCss = readFileSync(join(TEMPLATE_DIR, "src", "styles.css"), "utf8");
+  writeFileSync(join(srcDir, "styles.css"), tokensToCss(tokens) + "\n" + baseCss);
+  written.push(join(srcDir, "styles.css"));
+
+  // README
+  writeFileSync(
+    join(outDir, "README.md"),
+    `# ${spec.name}\n\nAuto-generated website skeleton.\n\n## Run it\n\n\`\`\`bash\nnpm install\nnpm run dev\n\`\`\`\n\nPages: ${spec.pages.map((p) => p.label).join(", ")}\n\nThemed with: primary ${tokens.primary}, accent ${tokens.accent}, ${tokens.font} font, ${tokens.radius} corners.\n\nThis is a starting skeleton — real content and logic are yours to fill in.\n`,
+  );
   written.push(join(outDir, "README.md"));
 
   return written;

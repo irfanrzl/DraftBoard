@@ -48,6 +48,10 @@ in `src/site/`. See `docs/WEBSITE-PIPELINE.md` for the full plan.
 - [x] A `.site` text input — `src/site/parse-sitetext.ts` (test without AI)
 - [x] Site generator → real multi-page React + Router site — `src/site/generate-site.ts`
 - [x] Page archetypes: hero, list, form, generic (auth/detail reuse these)
+- [x] Design tokens (Level 3, Depth 1): read colors/font/corners/spacing from a
+      mockup and theme the site. `--theme mockup.png` or `parse-tokens`.
+- [ ] Depth 2: component styles (button shape, input style, card treatment)
+- [ ] Depth 3: page layout reproduction (hard — where even v0/Figma are imperfect)
 - [ ] More archetypes (map, chat-stub, checkout-stub, dashboard reuse)
 - [ ] "Pages" vision prompt so screenshots → SiteSpec
 - [ ] Auto-detect ERD vs UI-flow and route to the right engine

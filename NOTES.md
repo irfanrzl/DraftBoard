@@ -126,3 +126,29 @@ name to PageType in site-spec.ts. Text/vision inputs need no change.
 Honest limit: this produces a SKELETON (right pages, working navigation,
 placeholder layouts). Real content and logic are the user's to fill in — a
 diagram can't specify those.
+
+## Design tokens (theming from a mockup — Level 3, Depth 1)
+
+Files in src/site/:
+- design-tokens.ts   — the DesignTokens schema + tokensToCss() (token → CSS vars)
+- design-prompt.ts   — the vision prompt for reading design from a mockup
+- extract-tokens.ts  — mockup image → DesignTokens (via vision module + sanitize)
+
+How it themes: generate-site.ts prepends tokensToCss(tokens) to the site's
+styles.css, so the same templates get re-themed. The template's styles.css uses
+var(--accent), var(--radius), var(--font), var(--density) etc. — themeable vars
+come from tokens, non-themeable (--muted/--line/--soft) stay in the base file.
+
+Commands:
+  npm run parse-tokens mockup.png              → prints extracted tokens (the "confirm" step)
+  npm run site x.site -- --out d --theme m.png → builds a themed site
+
+Default model is now qwen3-vl (I deleted llava/llama3.2-vision locally). Change
+in src/vision/ollama.ts or via OLLAMA_MODEL.
+
+Reminder — this is DEPTH 1 (theme only). Depth 2 = component styles (button/input/
+card design), Depth 3 = actual page layout. Both are next, not done. And feed the
+extractor ONE clean design, not a sheet of many thumbnails, or the read is muddled.
+
+The vision interface now takes optional custom prompts (VisionPrompts), so one
+module serves ERD reading AND design reading. See src/vision/types.ts.

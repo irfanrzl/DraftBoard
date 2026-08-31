@@ -11,6 +11,7 @@
     "scaffold-image": "tsx src/cli.ts scaffold-image",
     "web": "tsx src/server.ts",
     "site": "tsx src/cli.ts site",
+    "parse-tokens": "tsx src/cli.ts parse-tokens",
     "test": "vitest run"
   },
   "dependencies": {

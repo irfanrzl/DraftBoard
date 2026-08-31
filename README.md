@@ -5,6 +5,10 @@ Turn a database diagram into a working dashboard.
 Write your data model as DBML, and this tool generates an interactive
 React admin dashboard — tables, forms, detail views, and linked relations.
 
+Draftboard also has a **website engine**: turn a page/navigation description
+into a multi-page React site, optionally themed from a mockup image. See
+`docs/WEBSITE-ENGINE.md`.
+
 ## Easiest way: the web interface
 
 ```bash
@@ -78,4 +82,5 @@ for API calls; nothing else changes.
 - `docs/HEURISTICS.md` — the field → UI rules (the brain)
 - `docs/ROADMAP.md` — what's done and what's next
 - `docs/WEBSITE-PIPELINE.md` — the phase-2 plan (UI-flow → website)
+- `docs/WEBSITE-ENGINE.md` — the website engine + design-token theming
 - `docs-screenshot.md` — screenshot feature setup (Ollama / Gemini)

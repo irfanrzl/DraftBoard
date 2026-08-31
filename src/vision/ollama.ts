@@ -1,4 +1,4 @@
-import type { VisionProvider } from "./types.js";
+import type { VisionProvider, VisionPrompts } from "./types.js";
 import { VISION_SYSTEM_PROMPT, VISION_USER_PROMPT } from "./prompt.js";
 
 // Reads diagrams using a local Ollama model. Free, private, no API key.
@@ -7,15 +7,21 @@ import { VISION_SYSTEM_PROMPT, VISION_USER_PROMPT } from "./prompt.js";
 
 const OLLAMA_URL =
   process.env.OLLAMA_URL ?? "http://127.0.0.1:11434/api/chat";
-// Defaults to llava (works on all Ollama versions). If you update Ollama to a
-// recent version, "llama3.2-vision" reads diagrams more accurately — switch with
-// OLLAMA_MODEL=llama3.2-vision or by changing the default below.
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? "llava";
+// Defaults to qwen3-vl — a strong local vision model, good at reading diagrams
+// and design. Override with OLLAMA_MODEL=... (e.g. qwen3-vl:4b for less memory,
+// or a different model). Requires a recent Ollama version.
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? "qwen3-vl";
 
 export const ollamaProvider: VisionProvider = {
   name: `ollama:${OLLAMA_MODEL}`,
 
-  async readDiagram(imageBase64: string): Promise<string> {
+  async readDiagram(
+    imageBase64: string,
+    _mediaType: string,
+    prompts?: VisionPrompts,
+  ): Promise<string> {
+    const sys = prompts?.system ?? VISION_SYSTEM_PROMPT;
+    const usr = prompts?.user ?? VISION_USER_PROMPT;
     let res: Response;
     try {
       res = await fetch(OLLAMA_URL, {
@@ -26,10 +32,10 @@ export const ollamaProvider: VisionProvider = {
           stream: false,
           options: { temperature: 0 },
           messages: [
-            { role: "system", content: VISION_SYSTEM_PROMPT },
+            { role: "system", content: sys },
             {
               role: "user",
-              content: VISION_USER_PROMPT,
+              content: usr,
               images: [imageBase64],
             },
           ],

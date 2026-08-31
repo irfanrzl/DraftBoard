@@ -1,4 +1,4 @@
-// AUTO-GENERATED from your diagram. Do not edit by hand.
+// AUTO-GENERATED from your diagram.
 export const site = {
   "version": "1.0",
   "name": "Acme Services",

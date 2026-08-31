@@ -11,6 +11,8 @@ import { generateHtml } from "./generate-html.js";
 import { generateProject } from "./generate-app.js";
 import { parseSiteText } from "./site/parse-sitetext.js";
 import { generateSite } from "./site/generate-site.js";
+import { extractTokens } from "./site/extract-tokens.js";
+import { DEFAULT_TOKENS } from "./site/design-tokens.js";
 import type { Spec } from "./spec.js";
 
 function usage(): never {
@@ -23,6 +25,11 @@ function usage(): never {
   Image (screenshot -> needs a vision model, Ollama by default):
     npm run parse-image    <image.png>             print the Spec JSON
     npm run scaffold-image <image.png> -- --out dir  full React dashboard
+
+  Website engine (multi-page site from a .site file):
+    npm run site <file.site> -- --out dir                    build a site (preset theme)
+    npm run site <file.site> -- --out dir --theme mockup.png  theme it from a mockup image
+    npm run parse-tokens <mockup.png>                        just print the design tokens
 `);
   process.exit(1);
 }
@@ -118,6 +125,19 @@ async function main() {
     return;
   }
 
+  // ---- Design tokens: read a mockup's style and print it ----
+  if (command === "parse-tokens") {
+    let tokens;
+    try {
+      tokens = await extractTokens(file);
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : String(err));
+      process.exit(1);
+    }
+    console.log(JSON.stringify(tokens, null, 2));
+    return;
+  }
+
   // ---- Website engine: build a multi-page site from a .site file ----
   if (command === "site") {
     let source: string;
@@ -137,7 +157,27 @@ async function main() {
       process.exit(1);
     }
     const target = resolve(outDirFrom(rest));
-    const files = generateSite(siteSpec, target);
+
+    // Optional: --theme <mockup-image> extracts design tokens from a mockup.
+    let tokens = DEFAULT_TOKENS;
+    const themeFlag = rest.indexOf("--theme");
+    if (themeFlag !== -1 && rest[themeFlag + 1]) {
+      const mockup = rest[themeFlag + 1];
+      try {
+        tokens = await extractTokens(mockup);
+        console.log(
+          `Theme from mockup: primary ${tokens.primary}, accent ${tokens.accent}, ` +
+            `${tokens.font}, ${tokens.radius} corners, ${tokens.density}.`,
+        );
+      } catch (err) {
+        console.error(
+          "Could not extract theme, using default: " +
+            (err instanceof Error ? err.message : String(err)),
+        );
+      }
+    }
+
+    const files = generateSite(siteSpec, target, tokens);
     console.log(
       `Built ${siteSpec.pages.length} pages: ` +
         siteSpec.pages.map((p) => p.label).join(", "),

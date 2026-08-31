@@ -1,4 +1,4 @@
-import type { VisionProvider } from "./types.js";
+import type { VisionProvider, VisionPrompts } from "./types.js";
 import { VISION_SYSTEM_PROMPT, VISION_USER_PROMPT } from "./prompt.js";
 
 // Reads diagrams using Google Gemini. For when you commercialize: one business
@@ -11,7 +11,13 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-1.5-flash";
 export const geminiProvider: VisionProvider = {
   name: `gemini:${GEMINI_MODEL}`,
 
-  async readDiagram(imageBase64: string, mediaType: string): Promise<string> {
+  async readDiagram(
+    imageBase64: string,
+    mediaType: string,
+    prompts?: VisionPrompts,
+  ): Promise<string> {
+    const sys = prompts?.system ?? VISION_SYSTEM_PROMPT;
+    const usr = prompts?.user ?? VISION_USER_PROMPT;
     const key = process.env.GEMINI_API_KEY;
     if (!key) {
       throw new Error(
@@ -29,13 +35,13 @@ export const geminiProvider: VisionProvider = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         systemInstruction: {
-          parts: [{ text: VISION_SYSTEM_PROMPT }],
+          parts: [{ text: sys }],
         },
         contents: [
           {
             role: "user",
             parts: [
-              { text: VISION_USER_PROMPT },
+              { text: usr },
               { inline_data: { mime_type: mediaType, data: imageBase64 } },
             ],
           },
