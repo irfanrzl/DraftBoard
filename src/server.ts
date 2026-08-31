@@ -1,8 +1,8 @@
 // A small local web server that puts a friendly face on the engine.
 // No framework — just Node's built-in http. Reuses all existing engine code.
 import { createServer } from "node:http";
-import { readFileSync, mkdtempSync, rmSync, readdirSync, statSync } from "node:fs";
-import { join, dirname, relative } from "node:path";
+import { readFileSync, mkdtempSync, rmSync, readdirSync, statSync, existsSync } from "node:fs";
+import { join, dirname, relative, extname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { parseDbml } from "./parser.js";
@@ -13,8 +13,14 @@ import { generateProject } from "./generate-app.js";
 import type { Spec } from "./spec.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const WEB_DIR = join(__dirname, "..", "web");
-const PORT = Number(process.env.PORT ?? 3000);
+const WEB_DIST = join(__dirname, "..", "web", "dist");
+const PORT = Number(process.env.PORT ?? 3001);
+
+const MIME: Record<string, string> = {
+  ".html": "text/html", ".js": "text/javascript", ".css": "text/css",
+  ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png",
+  ".ico": "image/x-icon", ".woff2": "font/woff2",
+};
 
 // --- helpers ---
 
@@ -92,11 +98,6 @@ function listFiles(root: string, base = root): string[] {
 
 const server = createServer(async (req, res) => {
   try {
-    // Serve the page
-    if (req.method === "GET" && (req.url === "/" || req.url === "/index.html")) {
-      return send(res, 200, readFileSync(join(WEB_DIR, "index.html")), "text/html");
-    }
-
     // Generate a preview: returns the dashboard HTML + the spec
     if (req.method === "POST" && req.url === "/api/generate") {
       const body = JSON.parse(await readBody(req));
@@ -116,6 +117,19 @@ const server = createServer(async (req, res) => {
       const spec: Spec = body.spec;
       const files = collectProject(spec);
       return send(res, 200, JSON.stringify({ files }), "application/json");
+    }
+
+    // Static files: serve the built web app, with SPA fallback to index.html.
+    if (req.method === "GET") {
+      const urlPath = (req.url || "/").split("?")[0];
+      let filePath = join(WEB_DIST, urlPath === "/" ? "index.html" : urlPath);
+      if (!existsSync(filePath) || statSync(filePath).isDirectory()) {
+        filePath = join(WEB_DIST, "index.html"); // SPA fallback for /tool, /about, etc.
+      }
+      if (existsSync(filePath)) {
+        const type = MIME[extname(filePath)] || "application/octet-stream";
+        return send(res, 200, readFileSync(filePath), type);
+      }
     }
 
     send(res, 404, "Not found");

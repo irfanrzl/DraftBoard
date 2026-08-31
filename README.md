@@ -9,16 +9,22 @@ Draftboard also has a **website engine**: turn a page/navigation description
 into a multi-page React site, optionally themed from a mockup image. See
 `docs/WEBSITE-ENGINE.md`.
 
-## Easiest way: the web interface
+## Easiest way: the web app
 
 ```bash
 npm install
 npm run web
 ```
 
-Open http://localhost:3000. Paste DBML or Mermaid, or upload an ERD screenshot,
+This builds the web app and serves it at http://localhost:3001. It's a full
+multi-page app — a landing page, How-it-works, Examples, About, and the tool
+itself. On the tool page: paste DBML or Mermaid, or upload an ERD screenshot,
 click Generate, see the live preview, and download the full React project.
 (Screenshot input needs a vision model — see `docs/VISION.md`.)
+
+The web app lives in `web/` (React + Vite + Router). To develop it with hot
+reload, run `npm run web:dev` (the API) and `npm --prefix web run dev` (the UI)
+in two terminals.
 
 ## Run it (command line)
 

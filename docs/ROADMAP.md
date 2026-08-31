@@ -33,9 +33,9 @@ Where Draftboard is and where it's going. Checked = done and working.
 
 ## Next (making it a product)
 
-- [x] **Web interface** — a local page where you paste a diagram or upload a
-      screenshot and get the dashboard, with live preview + download. Run it
-      with `npm run web`. (Reused by the website pipeline later.)
+- [x] **Web app** — a full multi-page local app (Home, How it works, Examples,
+      About, and the Tool) in `web/` (React + Vite + Router), premium design.
+      Run with `npm run web`.
 - [ ] **Deploy it online** — put the web interface on a server so others can use
       it. Needs switching screenshot input from Ollama to Gemini (already built).
 

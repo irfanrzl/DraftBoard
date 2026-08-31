@@ -5,3 +5,7 @@ preview/
 my-dashboard/
 *.log
 .DS_Store
+
+# web app build
+web/dist/
+web/node_modules/

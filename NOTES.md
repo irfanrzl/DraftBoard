@@ -152,3 +152,20 @@ extractor ONE clean design, not a sheet of many thumbnails, or the read is muddl
 
 The vision interface now takes optional custom prompts (VisionPrompts), so one
 module serves ERD reading AND design reading. See src/vision/types.ts.
+
+## The web app (web/) — now multi-page React
+
+The control panel is now a full React + Vite + Router app in web/, not a single
+html file. Pages in web/src/pages/: Home, Tool, HowItWorks, Examples, About.
+Shell (nav + footer) is web/src/App.jsx. Styles in web/src/styles.css.
+
+- The Tool page (web/src/pages/Tool.jsx) has all the generate/preview/download
+  logic. It calls /api/generate and /api/download.
+- server.ts serves the BUILT app (web/dist) + the API, on port 3001.
+- `npm run web` = install web deps, build web, start server (serves everything).
+- To edit the UI with hot reload: `npm run web:dev` (API) + `npm --prefix web run dev`
+  (Vite, proxies /api to the server).
+
+To change the landing/about/etc content, edit the page files in web/src/pages/.
+To change the tool, edit web/src/pages/Tool.jsx.
+Remember to update your real email in web/src/pages/About.jsx.

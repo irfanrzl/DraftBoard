@@ -9,7 +9,8 @@
     "scaffold": "tsx src/cli.ts create",
     "parse-image": "tsx src/cli.ts parse-image",
     "scaffold-image": "tsx src/cli.ts scaffold-image",
-    "web": "tsx src/server.ts",
+    "web": "npm --prefix web install && npm --prefix web run build && tsx src/server.ts",
+    "web:dev": "tsx src/server.ts",
     "site": "tsx src/cli.ts site",
     "parse-tokens": "tsx src/cli.ts parse-tokens",
     "test": "vitest run"
