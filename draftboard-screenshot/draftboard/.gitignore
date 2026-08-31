@@ -1,7 +1,0 @@
-node_modules/
-dist/
-generated/
-preview/
-my-dashboard/
-*.log
-.DS_Store
