@@ -1,0 +1,27 @@
+// Sample input — a tiny blog schema.
+// Run: pnpm generate examples/blog.dbml --out ./generated
+
+Table User {
+  id uuid [pk]
+  email varchar [unique, not null]
+  name varchar
+  status varchar [note: 'enum: active, banned']
+  avatar_url varchar
+  created_at timestamp
+}
+
+Table Post {
+  id uuid [pk]
+  title varchar [not null]
+  body text
+  user_id uuid [ref: > User.id]
+  created_at timestamp
+}
+
+Table Comment {
+  id uuid [pk]
+  body text
+  post_id uuid [ref: > Post.id]
+  user_id uuid [ref: > User.id]
+  created_at timestamp
+}
