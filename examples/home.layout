@@ -1,7 +1,0 @@
-layout "Acme"
-nav
-hero split-right
-grid 3
-feature left
-cta
-footer
