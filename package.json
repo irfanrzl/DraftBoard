@@ -3,27 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "description": "Turn an ERD or wireframe (text or screenshot) into a working dashboard or website draft, using Gemini 3.5 Flash.",
   "scripts": {
-    "parse": "tsx src/cli.ts parse",
-    "generate": "tsx src/cli.ts generate",
-    "scaffold": "tsx src/cli.ts create",
-    "parse-image": "tsx src/cli.ts parse-image",
-    "scaffold-image": "tsx src/cli.ts scaffold-image",
-    "web": "npm --prefix web install && npm --prefix web run build && tsx src/server.ts",
-    "web:dev": "tsx src/server.ts",
-    "site": "tsx src/cli.ts site",
-    "layout": "tsx src/cli.ts layout",
-    "parse-tokens": "tsx src/cli.ts parse-tokens",
-    "test": "vitest run"
+    "dev": "tsx watch server/index.ts",
+    "start": "tsx server/index.ts"
   },
   "dependencies": {
-    "@dbml/core": "^3.9.5",
-    "zod": "^3.23.8"
+    "@google/genai": "latest",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.9",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0",
-    "vitest": "^2.1.0"
+    "typescript": "^5.5.4"
   }
 }

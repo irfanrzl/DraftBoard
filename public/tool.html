@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Draftboard — tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="root"><div class="shell shell-tool"><header class="topnav"><a class="mark" href="/"><span class="diamond"></span><span class="wordmark">Draftboard</span></a><nav class="topnav-links"><a class="tnav" href="/">Home</a><a class="tnav" href="/how">How it works</a><a class="tnav" href="/examples">Examples</a><a class="tnav" href="/about">About</a></nav><a class="tnav-cta" href="/tool">Open the tool</a></header><main class="shell-main"><div class="tool">
+
+  <div class="tool-panel">
+    <div class="seg">
+      <div class="seg-pill" id="seg-pill"></div>
+      <button type="button" class="seg-btn on" id="seg-dashboard" data-mode="dashboard">Dashboard</button>
+      <button type="button" class="seg-btn" id="seg-website" data-mode="website">Website</button>
+    </div>
+
+    <div class="mini-label" id="label-image">An ERD, diagram, or description of your data</div>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload a screenshot">
+      <div class="drop-ico" id="drop-ico">◇</div>
+      <div class="drop-big" id="drop-big">Drop an ERD or diagram</div>
+      <div class="drop-sub">or click to browse · PNG, JPG · optional</div>
+      <div class="drop-sub">reads with Gemini</div>
+      <input type="file" id="image-input" accept="image/*" hidden />
+    </div>
+
+    <div class="mini-label" style="margin-top:14px" id="label-text">Describe your data</div>
+    <textarea class="code" id="diagram-text" spellcheck="false" placeholder="e.g. Users (name, email, role), Posts (title, body, author)..."></textarea>
+
+    <div class="examples" id="examples-row">
+      Try an example:
+      <a id="example-blog" data-example="blog">Blog schema</a> ·
+      <a id="example-shop" data-example="shop">Shop schema</a>
+    </div>
+
+    <div class="tool-controls">
+      <button type="button" class="gen" id="generate-btn">Generate dashboard</button>
+    </div>
+    <div class="tool-error" id="tool-error" hidden></div>
+  </div>
+
+  <div class="tool-stage">
+    <div class="stage-bar">
+      <div class="stage-status">
+        <span class="dot" id="status-dot"></span>
+        <span id="status-text">Ready when you are</span>
+      </div>
+      <button type="button" class="dl" id="download-btn" disabled>↓ Download dashboard.html</button>
+    </div>
+    <div class="stage-screen">
+      <div class="stage-empty" id="stage-empty">
+        <div class="empty-glyph">◇</div>
+        <div class="empty-title" id="empty-title">Your dashboard appears here</div>
+        <div class="empty-sub">Give it an image and/or a description, then generate to see it live.</div>
+      </div>
+      <div class="frame-wrap" id="frame-wrap" hidden>
+        <iframe id="preview" title="Generated draft preview"></iframe>
+      </div>
+    </div>
+  </div>
+
+</div></main></div></div>
+<script src="app.js"></script>
+</body>
+</html>

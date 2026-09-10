@@ -1,92 +1,72 @@
 # Draftboard
 
-Turn a database diagram into a working dashboard.
+Turn an ERD or a wireframe — text or screenshot — into a working dashboard or website draft. One input panel, one model call, one HTML file out.
 
-Write your data model as DBML, and this tool generates an interactive
-React admin dashboard — tables, forms, detail views, and linked relations.
+## How it works
 
-Draftboard also has a **website engine**: turn a page/navigation description
-into a multi-page React site, optionally themed from a mockup image. See
-`docs/WEBSITE-ENGINE.md`.
+There's no diagram parser, no schema, no component library. Everything goes through a single call to **Gemini 3.5 Flash**:
 
-## Easiest way: the web app
-
-```bash
-npm install
-npm run web
+```
+your input (text and/or image) + a system prompt that:
+  1. classifies it — ERD -> dashboard, wireframe -> website, free text -> website
+  2. tells Gemini to write one complete, self-contained HTML file
+     -> Gemini's raw output IS the draft
 ```
 
-This builds the web app and serves it at http://localhost:3001. It's a full
-multi-page app — a landing page, How-it-works, Examples, About, and the tool
-itself. On the tool page: paste DBML or Mermaid, or upload an ERD screenshot,
-click Generate, see the live preview, and download the full React project.
-(Screenshot input needs a vision model — see `docs/VISION.md`.)
+That's the whole engine (`server/gemini.ts` + `server/prompt.ts`). The dashboard gets working search/sort/CRUD against placeholder in-memory data; the website gets working nav and placeholder copy/images. Everything is a draft for you to review and wire up to a real backend afterwards.
 
-The web app lives in `web/` (React + Vite + Router). To develop it with hot
-reload, run `npm run web:dev` (the API) and `npm --prefix web run dev` (the UI)
-in two terminals.
+## Setup (VS Code)
 
-## Run it (command line)
+1. Open this folder in VS Code.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Get a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey), then:
+   ```bash
+   cp .env.example .env
+   ```
+   and paste your key into `.env` as `GEMINI_API_KEY=...`.
+4. Run it:
+   ```bash
+   npm run dev
+   ```
+5. Open http://localhost:5173
 
-```bash
-npm install
+## Pages
 
-# see the parsed structure
-npm run parse examples/blog.dbml
+- `/` — home / landing page
+- `/how` — how it works
+- `/examples` — sample DBML / Mermaid inputs
+- `/about` — about the project
+- `/tool` — the actual tool
 
-# also works with Mermaid ERD text
-npm run parse examples/shop.mmd
+## Using the tool
 
-# quick single-file HTML preview
-npm run generate examples/blog.dbml -- --out preview
+- Paste DBML or Mermaid ERD text, **or** just describe what you want in plain English, **or** drop in a screenshot (ERD export or wireframe) — any combination works. The Dashboard/Website toggle only changes the panel's labels and the downloaded filename; the engine still classifies your input itself, same as before. There are two ready-made examples you can load with one click.
+- Click **Generate**. The result renders live in the paper panel on the right, with a brief reveal animation.
+- **Download** saves the single-file draft as `dashboard.html` / `website.html`.
 
-# the real thing: a full React app you can click around
-npm run scaffold examples/blog.dbml -- --out my-dashboard
-cd my-dashboard
-npm install
-npm run dev
+## Project layout
+
+```
+draftboard/
+  server/
+    index.ts    — Express app: serves public/ (clean URLs via extensions
+                  fallback, e.g. /how -> how.html) + POST /api/generate
+    gemini.ts   — the single Gemini 3.5 Flash call
+    prompt.ts   — the system prompt (classification rules + fidelity criteria)
+  public/
+    index.html  — home page
+    how.html, examples.html, about.html — marketing pages
+    tool.html   — the working tool UI
+    styles.css  — shared stylesheet for every page
+    app.js      — tool page logic (mode toggle, dropzone, generate, preview)
 ```
 
-## From a screenshot (AI feature)
+## Notes
 
-Turn a picture of an ERD into a dashboard. Needs a vision model — free with a
-local vision model (see `docs/VISION.md`):
-
-```bash
-npm run scaffold-image path/to/your-erd.png -- --out my-dashboard
-```
-
-Then open the URL it prints (usually http://localhost:5173).
-
-## What's where
-
-Everything lives in `src/` — six small files, in the order data flows:
-
-| File | Job |
-|------|-----|
-| `src/cli.ts` | the command you run (parse / generate / scaffold) |
-| `src/spec.ts` | the data shape everything agrees on (the "contract") |
-| `src/parser.ts` | reads DBML → Spec, and decides each field's UI |
-| `src/mock.ts` | makes sample data |
-| `src/generate-html.ts` | Spec → one static HTML preview |
-| `src/generate-app.ts` | Spec → a full React project |
-| `app-template/` | the dashboard app that gets copied out and filled in |
-
-See `NOTES.md` for a plain-language tour and "where do I change X" tips.
-
-## The idea
-
-The generated app is a generic dashboard that reads an injected `schema.js`.
-So the same app code works for any database — the tool just writes the schema
-and sample data into it. To use real data later, swap `app-template/src/store.jsx`
-for API calls; nothing else changes.
-
-## Docs
-
-- `NOTES.md` — casual "where do I change X" guide for future-me
-- `docs/ARCHITECTURE.md` — how it works: the two engines + shared vision
-- `docs/VISION.md` — reading images (ERD screenshots, design mockups), model setup
-- `docs/HEURISTICS.md` — dashboard field → UI rules
-- `docs/WEBSITE-ENGINE.md` — the website engine + design-token theming
-- `docs/ROADMAP.md` — the journey: what's done and what's next
-- `NOTES.md` — casual "where do I change X" for future-me
+- Every request sends the full prompt + optional image to Gemini and gets back one HTML document — there's no caching or persistence yet, each draft is generated fresh.
+- Image uploads are capped by the 25MB JSON body limit set in `server/index.ts`; resize screenshots if you hit that.
+- If Gemini ever wraps its output in ```html fences despite being told not to, `gemini.ts` strips them automatically.
+- The site copy is intentionally accurate about what's actually happening: generation calls Google's Gemini API with whatever key you provide (not a local/offline model), and the output is a single HTML file rather than a downloadable multi-file project.
